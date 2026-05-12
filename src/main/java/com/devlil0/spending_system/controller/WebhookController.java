@@ -45,11 +45,12 @@ public class WebhookController {
         }
 
         String phone = extractPhone(resolveSenderJid(payload, remoteJid));
+        String replyTarget = resolveReplyTarget(remoteJid, phone);
         String reply = spendingService.processMessage(phone, text.trim());
         try {
-            whatsappSendMsgService.sendText(phone, reply);
+            whatsappSendMsgService.sendText(replyTarget, reply);
         } catch (RuntimeException ex) {
-            log.warn("Failed to send WhatsApp reply to {}", phone, ex);
+            log.warn("Failed to send WhatsApp reply to {}", replyTarget, ex);
         }
 
         return ResponseEntity.ok().build();
@@ -65,6 +66,14 @@ public class WebhookController {
         }
 
         return remoteJid;
+    }
+
+    private String resolveReplyTarget(String remoteJid, String phone) {
+        if (remoteJid.endsWith("@g.us")) {
+            return remoteJid;
+        }
+
+        return phone;
     }
 
     private boolean isBotReply(String text) {
