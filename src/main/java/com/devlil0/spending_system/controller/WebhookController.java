@@ -56,7 +56,7 @@ public class WebhookController {
         }
 
         String replyTarget = resolveReplyTarget(remoteJid, phone);
-        String reply = spendingService.processMessage(phone, text.trim());
+        String reply = spendingService.processMessage(normalizeJid(remoteJid), text.trim());
         try {
             whatsappSendMsgService.sendText(replyTarget, reply);
         } catch (RuntimeException ex) {
@@ -117,6 +117,8 @@ public class WebhookController {
 
     private boolean isBotReply(String text) {
         return text.startsWith("Gasto registrado!")
+                || text.startsWith("Digite o seu nome:")
+                || text.startsWith("Olá ")
                 || text.startsWith("Não entendi.")
                 || text.startsWith("Nenhum gasto registrado")
                 || text.startsWith("Nenhum gasto encontrado")

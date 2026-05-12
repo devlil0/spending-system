@@ -53,7 +53,19 @@ Defina `BOT_ALLOWED_JIDS` para evitar que o bot responda conversas fora da lista
 $env:BOT_ALLOWED_JIDS="120363123456789012@g.us,120363987654321098@g.us"
 ```
 
-Use o JID completo da conversa. Para grupos, o JID termina com `@g.us`; para conversa direta, normalmente termina com `@s.whatsapp.net`. Em grupos autorizados, qualquer participante pode enviar mensagens e o bot responde no grupo.
+Use o JID completo da conversa. Para grupos, o JID termina com `@g.us`; para conversa direta, normalmente termina com `@s.whatsapp.net`. Em grupos autorizados, qualquer participante pode enviar mensagens e o bot responde no grupo. Os gastos, resumos e remocoes ficam separados por JID da conversa.
+
+Na primeira mensagem de cada JID, o bot solicita um nome de sessao:
+
+```text
+Digite o seu nome:
+```
+
+A resposta seguinte salva o nome da sessao, por exemplo `Juliana`, e o bot responde `Olá Juliana`. Depois disso, o resumo usa esse nome:
+
+```text
+TOTAL DE GASTOS JULIANA:
+```
 
 ## Rodando localmente
 

@@ -9,12 +9,12 @@ import java.util.List;
 @Repository
 public interface SpendingRepository extends JpaRepository<SpendingEntity, Long> {
 
-    List<SpendingEntity> findByPhone(String phone);
+    List<SpendingEntity> findByJid(String jid);
 
-    List<SpendingEntity> findByPhoneOrderByCreatedAtAsc(String phone);
+    List<SpendingEntity> findByJidOrderByCreatedAtAsc(String jid);
 
-    List<SpendingEntity> findByPhoneAndDescriptionIgnoreCase(String phone, String description);
+    List<SpendingEntity> findByJidAndDescriptionIgnoreCase(String jid, String description);
 
-    void deleteByPhone(String phone);
+    void deleteByJid(String jid);
 
 }
