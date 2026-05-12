@@ -66,13 +66,13 @@ public class SpendingService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StringBuilder summary = new StringBuilder();
-        summary.append("*TOTAL DE GASTOS* \n");
+        summary.append("*TOTAL DE GASTOS* \uD83D\uDCC8\n");
 
 
 
         for (int i = 0; i < gastos.size(); i++) {
             SpendingEntity gasto = gastos.get(i);
-            summary.append(String.format("%d. %s | R$ %.2f | %s",
+            summary.append(String.format("%d. %s | R$ %.2f | %s\n\n",
 
                     i + 1,
                     gasto.getDescription(),
