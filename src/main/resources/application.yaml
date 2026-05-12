@@ -3,9 +3,9 @@ spring:
     name: spending_system
 
   datasource:
-    url: jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:spendingsystem}
-    username: ${PGUSER:postgres}
-    password: ${PGPASSWORD:postgres}
+    url: jdbc:postgresql://localhost:5432/${PGDATABASE:spendingsystem}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
