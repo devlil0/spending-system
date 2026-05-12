@@ -30,17 +30,17 @@ public class WebhookController {
             return ResponseEntity.ok().build();
         }
 
-        if (data.getKey().isFromMe()) {
-            return ResponseEntity.ok().build();
-        }
-
         String remoteJid = data.getKey().getRemoteJid();
         String text = data.getMessage().getText();
         if (remoteJid == null || text == null || text.isBlank()) {
             return ResponseEntity.ok().build();
         }
 
-        String phone = extractPhone(remoteJid);
+        if (isBotReply(text)) {
+            return ResponseEntity.ok().build();
+        }
+
+        String phone = extractPhone(resolveSenderJid(payload, remoteJid));
         String reply = spendingService.processMessage(phone, text.trim());
         whatsappSendMsgService.sendText(phone, reply);
 
@@ -49,6 +49,21 @@ public class WebhookController {
 
     private String extractPhone(String remoteJid) {
         return remoteJid.split("@")[0];
+    }
+
+    private String resolveSenderJid(EvolutionWebhookPayload payload, String remoteJid) {
+        if (remoteJid.endsWith("@g.us") && payload.getSender() != null && !payload.getSender().isBlank()) {
+            return payload.getSender();
+        }
+
+        return remoteJid;
+    }
+
+    private boolean isBotReply(String text) {
+        return text.startsWith("Gasto registrado!")
+                || text.startsWith("Não entendi.")
+                || text.startsWith("Nenhum gasto registrado")
+                || text.startsWith("📊");
     }
 
 }

@@ -7,5 +7,6 @@ public class EvolutionWebhookPayload {
 
     private String event;
     private String instance;
+    private String sender;
     private MessageData data;
 }
