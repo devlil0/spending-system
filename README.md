@@ -121,6 +121,15 @@ Uber 22,90 Transporte
 
 Categoria e data sao opcionais. Sem categoria, o bot usa `Outros`. Sem data, o bot usa a data e horario atuais.
 
+Tambem e possivel registrar varios gastos em uma unica mensagem, usando uma linha por gasto:
+
+```text
+Davo 336.29 Mercado 01/05
+Semar 210.83 Mercado 05/05
+Shibata 182.97 Mercado 05/05
+Ronaldo Almoco 37.00 Alimentacao 11/05
+```
+
 Ver resumo:
 
 ```text

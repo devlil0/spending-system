@@ -6,6 +6,7 @@ import lombok.Data;
 public class MessageKey {
 
     private String remoteJid;
+    private String participant;
     private boolean fromMe;
 
 }

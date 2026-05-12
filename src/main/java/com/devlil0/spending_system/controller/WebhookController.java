@@ -48,7 +48,7 @@ public class WebhookController {
             return ResponseEntity.ok().build();
         }
 
-        String senderJid = resolveSenderJid(payload, remoteJid);
+        String senderJid = resolveSenderJid(payload, data, remoteJid);
         String phone = extractPhone(senderJid);
 
         if (isBotReply(text)) {
@@ -99,7 +99,13 @@ public class WebhookController {
         return phone.replaceAll("\\D", "");
     }
 
-    private String resolveSenderJid(EvolutionWebhookPayload payload, String remoteJid) {
+    private String resolveSenderJid(EvolutionWebhookPayload payload, MessageData data, String remoteJid) {
+        if (remoteJid.endsWith("@g.us")
+                && data.getKey().getParticipant() != null
+                && !data.getKey().getParticipant().isBlank()) {
+            return data.getKey().getParticipant();
+        }
+
         if (remoteJid.endsWith("@g.us") && payload.getSender() != null && !payload.getSender().isBlank()) {
             return payload.getSender();
         }
@@ -117,6 +123,7 @@ public class WebhookController {
 
     private boolean isBotReply(String text) {
         return text.startsWith("Gasto registrado!")
+                || text.matches("^\\d+ gastos registrados![\\s\\S]*")
                 || text.startsWith("Digite o seu nome:")
                 || text.startsWith("Olá ")
                 || text.startsWith("Não entendi.")

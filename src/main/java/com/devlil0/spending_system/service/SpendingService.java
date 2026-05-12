@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +62,10 @@ public class SpendingService {
             return removeSpending(jid, removeMatcher.group(1).trim());
         }
 
+        if (text.lines().filter(line -> !line.isBlank()).count() > 1) {
+            return saveMultipleSpendings(jid, phone, text);
+        }
+
         return messageParser.parse(text)
                 .map(req -> saveSpending(jid, phone, req))
                 .orElse("Não entendi. Envie no formato: *Descrição Valor* (ex: Pizza 50) ou *Descrição Valor Categoria Data* (ex: Pizza 50 Alimentacao 12/05)");
@@ -78,7 +84,47 @@ public class SpendingService {
         return name;
     }
 
+    private String saveMultipleSpendings(String jid, String phone, String text) {
+        List<SpendingEntity> saved = new ArrayList<>();
+        List<String> invalidLines = new ArrayList<>();
+
+        text.lines()
+                .map(String::trim)
+                .filter(line -> !line.isBlank())
+                .forEach(line -> messageParser.parse(line)
+                        .ifPresentOrElse(
+                                req -> saved.add(saveSpendingEntity(jid, phone, req)),
+                                () -> invalidLines.add(line)));
+
+        if (saved.isEmpty()) {
+            return "Não entendi nenhum gasto. Envie uma linha por gasto no formato: *Descrição Valor Categoria Data*";
+        }
+
+        StringBuilder reply = new StringBuilder();
+        reply.append(String.format("%d gastos registrados!", saved.size()));
+
+        BigDecimal total = saved.stream()
+                .map(SpendingEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        reply.append(String.format("\nTOTAL: R$ %.2f", total));
+
+        if (!invalidLines.isEmpty()) {
+            reply.append("\n\nLinhas ignoradas:");
+            invalidLines.forEach(line -> reply.append("\n- ").append(line));
+        }
+
+        return reply.toString();
+    }
+
     private String saveSpending(String jid, String phone, com.devlil0.spending_system.dto.SpendingRequest req) {
+        saveSpendingEntity(jid, phone, req);
+
+        return String.format("Gasto registrado!\n%s\nR$ %.2f\n%s\n%s",
+                req.description(), req.amount(), req.category(), req.date().format(SUMMARY_DATE_FORMATTER));
+    }
+
+    private SpendingEntity saveSpendingEntity(String jid, String phone, com.devlil0.spending_system.dto.SpendingRequest req) {
         var entity = SpendingEntity.builder()
                 .jid(jid)
                 .phone(phone)
@@ -88,10 +134,7 @@ public class SpendingService {
                 .createdAt(req.date())
                 .build();
 
-        spendingRepository.save(entity);
-
-        return String.format("Gasto registrado!\n%s\nR$ %.2f\n%s\n%s",
-                req.description(), req.amount(), req.category(), req.date().format(SUMMARY_DATE_FORMATTER));
+        return spendingRepository.save(entity);
     }
 
     private String buildSummary(String jid, String sessionName) {
