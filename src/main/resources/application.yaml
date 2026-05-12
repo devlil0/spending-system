@@ -20,3 +20,5 @@ evolution:
 
 bot:
   allowed-jids: ${BOT_ALLOWED_JIDS:}
+  daily-summary-enabled: ${BOT_DAILY_SUMMARY_ENABLED:true}
+  daily-summary-cron: ${BOT_DAILY_SUMMARY_CRON:0 0 21 * * *}

@@ -46,6 +46,8 @@ As configuracoes podem ser definidas por variaveis de ambiente:
 | `EVOLUTION_API_KEY` | vazio | Chave da Evolution API |
 | `EVOLUTION_INSTANCE` | vazio | Nome da instancia na Evolution API |
 | `BOT_ALLOWED_JIDS` | vazio | JIDs autorizados a acionar o bot, separados por virgula |
+| `BOT_DAILY_SUMMARY_ENABLED` | `true` | Habilita resumo diario automatico |
+| `BOT_DAILY_SUMMARY_CRON` | `0 0 21 * * *` | Cron do resumo diario no fuso `America/Sao_Paulo` |
 
 Defina `BOT_ALLOWED_JIDS` para evitar que o bot responda conversas fora da lista:
 
@@ -134,6 +136,10 @@ Ver resumo:
 
 ```text
 gastos
+gastos hoje
+gastos semana
+gastos mes
+gastos 01/05 15/05
 ```
 
 Ver totais por categoria:
@@ -147,6 +153,31 @@ Ver detalhes de uma categoria:
 ```text
 categoria Alimentacao
 categoria Mercado
+categoria Mercado mes
+categoria Mercado 01/05 15/05
+```
+
+Ver maiores gastos:
+
+```text
+maiores
+maiores 10
+```
+
+Editar gasto pelo ID exibido em `gastos` ou pelo nome, quando houver apenas um gasto com aquele nome:
+
+```text
+editar 3 valor 45,90
+editar Pizza valor 45,90
+editar 3 categoria Mercado
+editar 3 data 12/05
+editar 3 nome Padaria
+```
+
+Ver todos os comandos:
+
+```text
+ajuda
 ```
 
 Remover gasto por descricao:
@@ -154,6 +185,7 @@ Remover gasto por descricao:
 ```text
 remover "Pizza"
 remover Pizza
+remover 3
 ```
 
 Remover todos os gastos do seu numero:
