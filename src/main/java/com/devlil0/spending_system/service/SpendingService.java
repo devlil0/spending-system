@@ -227,10 +227,7 @@ public class SpendingService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StringBuilder summary = new StringBuilder();
-        summary.append(String.format("*TOTAL GASTO %s:*\n", gastos.getFirst().getCategory()));
-        summary.append(String.format("TOTAL: R$ %.2f\n", total));
-        summary.append(String.format("ITEMS: %d\n", gastos.size()));
-        summary.append("NOME | VALOR | DATA\n");
+        summary.append(String.format("*GASTOS (%s):*\n\n", gastos.getFirst().getCategory()));
 
         for (int i = 0; i < gastos.size(); i++) {
             SpendingEntity gasto = gastos.get(i);
@@ -239,7 +236,14 @@ public class SpendingService {
                     gasto.getDescription(),
                     gasto.getAmount(),
                     gasto.getCreatedAt().format(SUMMARY_DATE_FORMATTER)));
+
+            if (i < gastos.size() - 1) {
+                summary.append("\n");
+            }
         }
+
+        summary.append(String.format("\nTOTAL: R$ %.2f\n", total));
+        summary.append(String.format("ITEMS: %d\n", gastos.size()));
 
         return summary.toString();
     }
