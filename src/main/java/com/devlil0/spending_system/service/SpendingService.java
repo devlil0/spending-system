@@ -10,12 +10,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,8 @@ public class SpendingService {
 
     private static final Pattern REMOVE_PATTERN =
             Pattern.compile("^remover\\s+\"?(.+?)\"?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CATEGORY_PATTERN =
+            Pattern.compile("^categoria\\s+(.+)$", Pattern.CASE_INSENSITIVE);
     private static final DateTimeFormatter SUMMARY_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -51,6 +58,15 @@ public class SpendingService {
         String sessionName = session.getName();
         if (text.equalsIgnoreCase("/resumo")) {
             return buildSummary(jid, sessionName);
+        }
+
+        if (text.equalsIgnoreCase("categorias")) {
+            return buildCategoriesSummary(jid);
+        }
+
+        Matcher categoryMatcher = CATEGORY_PATTERN.matcher(text.trim());
+        if (categoryMatcher.matches()) {
+            return buildCategoryDetails(jid, categoryMatcher.group(1).trim());
         }
 
         if (text.equalsIgnoreCase("remover todos")) {
@@ -168,6 +184,74 @@ public class SpendingService {
         summary.append(String.format("ITEMS: %d\n", gastos.size()));
         return summary.toString();
 
+    }
+
+    private String buildCategoriesSummary(String jid) {
+        var gastos = spendingRepository.findByJidOrderByCreatedAtAsc(jid);
+
+        if (gastos.isEmpty()) return "*NENHUM GASTO REGISTRADO!*";
+
+        Map<String, BigDecimal> totalsByCategory = gastos.stream()
+                .collect(Collectors.groupingBy(
+                        SpendingEntity::getCategory,
+                        LinkedHashMap::new,
+                        Collectors.mapping(SpendingEntity::getAmount, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
+
+        StringBuilder summary = new StringBuilder("*CATEGORIAS*\n");
+        totalsByCategory.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> summary.append(String.format("%s: R$ %.2f\n", entry.getKey(), entry.getValue())));
+
+        BigDecimal total = gastos.stream()
+                .map(SpendingEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        summary.append(String.format("TOTAL: R$ %.2f", total));
+
+        return summary.toString();
+    }
+
+    private String buildCategoryDetails(String jid, String category) {
+        String displayCategory = category.toUpperCase(Locale.ROOT);
+        String comparableCategory = normalizeCategory(category);
+        var gastos = spendingRepository.findByJidOrderByCreatedAtAsc(jid).stream()
+                .filter(gasto -> normalizeCategory(gasto.getCategory()).equals(comparableCategory))
+                .sorted(Comparator.comparing(SpendingEntity::getCreatedAt))
+                .toList();
+
+        if (gastos.isEmpty()) {
+            return String.format("NENHUM GASTO NA CATEGORIA %s", displayCategory);
+        }
+
+        BigDecimal total = gastos.stream()
+                .map(SpendingEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        StringBuilder summary = new StringBuilder();
+        summary.append(String.format("*TOTAL GASTO %s:*\n", gastos.getFirst().getCategory()));
+        summary.append(String.format("TOTAL: R$ %.2f\n", total));
+        summary.append(String.format("ITEMS: %d\n", gastos.size()));
+        summary.append("NOME | VALOR | DATA\n");
+
+        for (int i = 0; i < gastos.size(); i++) {
+            SpendingEntity gasto = gastos.get(i);
+            summary.append(String.format("%d. %s | R$ %.2f | %s\n",
+                    i + 1,
+                    gasto.getDescription(),
+                    gasto.getAmount(),
+                    gasto.getCreatedAt().format(SUMMARY_DATE_FORMATTER)));
+        }
+
+        return summary.toString();
+    }
+
+    private String normalizeCategory(String category) {
+        if (category == null) {
+            return "";
+        }
+
+        String noAccents = Normalizer.normalize(category, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return noAccents.trim().toUpperCase(Locale.ROOT);
     }
 
     private String removeSpending(String jid, String description) {

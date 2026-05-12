@@ -136,6 +136,19 @@ Ver resumo:
 /resumo
 ```
 
+Ver totais por categoria:
+
+```text
+categorias
+```
+
+Ver detalhes de uma categoria:
+
+```text
+categoria Alimentacao
+categoria Mercado
+```
+
 Remover gasto por descricao:
 
 ```text

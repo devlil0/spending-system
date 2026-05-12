@@ -8,25 +8,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 public class MessageParser {
 
-    // Formato esperado: "<descrição> <valor>", com categoria e data opcionais no fim.
-    private static final Pattern SPENDING_PATTERN =
-            Pattern.compile("^(.+?)\\s+(\\d+(?:[.,]\\d{1,2})?)(?:\\s+(.+))?$", Pattern.CASE_INSENSITIVE);
+    // Tudo antes do primeiro valor numerico e tratado como nome/descricao.
+    private static final Pattern AMOUNT_PATTERN = Pattern.compile("\\d+(?:[.,]\\d{1,2})?");
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{2}/\\d{2}");
 
     public Optional<SpendingRequest> parse(String text) {
-        Matcher matcher = SPENDING_PATTERN.matcher(text.trim());
-        if (!matcher.matches()) return Optional.empty();
+        String[] tokens = text.trim().split("\\s+");
+        int amountIndex = findAmountIndex(tokens);
+        if (amountIndex <= 0) return Optional.empty();
 
-        String description = matcher.group(1).trim();
-        BigDecimal amount = new BigDecimal(matcher.group(2).replace(",", "."));
-        String categoryAndDate = matcher.group(3) != null ? matcher.group(3).trim() : "";
+        String description = String.join(" ", Arrays.copyOfRange(tokens, 0, amountIndex)).trim();
+        BigDecimal amount = new BigDecimal(tokens[amountIndex].replace(",", "."));
+        String categoryAndDate = String.join(" ", Arrays.copyOfRange(tokens, amountIndex + 1, tokens.length)).trim();
         LocalDateTime date = LocalDateTime.now();
         String category = categoryAndDate.isBlank() ? "Outros" : categoryAndDate;
 
@@ -51,5 +51,15 @@ public class MessageParser {
         }
 
         return Optional.of(new SpendingRequest(description, amount, category, date));
+    }
+
+    private int findAmountIndex(String[] tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            if (AMOUNT_PATTERN.matcher(tokens[i]).matches()) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
