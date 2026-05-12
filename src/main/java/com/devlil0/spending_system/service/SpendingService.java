@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,16 +21,21 @@ public class SpendingService {
 
     private static final Pattern REMOVE_PATTERN =
             Pattern.compile("^remover\\s+\"?(.+?)\"?$", Pattern.CASE_INSENSITIVE);
+    private static final DateTimeFormatter SUMMARY_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final SpendingRepository spendingRepository;
     private final BotSessionRepository botSessionRepository;
     private final MessageParser messageParser;
 
     @Transactional
-    public String processMessage(String jid, String text) {
-        var session = botSessionRepository.findByJid(jid).orElse(null);
+    public String processMessage(String jid, String phone, String text) {
+        var session = botSessionRepository.findByPhone(phone).orElse(null);
         if (session == null) {
-            botSessionRepository.save(BotSessionEntity.builder().jid(jid).build());
+            botSessionRepository.save(BotSessionEntity.builder()
+                    .jid(jid)
+                    .phone(phone)
+                    .build());
             return "Digite o seu nome:";
         }
 
@@ -55,8 +61,8 @@ public class SpendingService {
         }
 
         return messageParser.parse(text)
-                .map(req -> saveSpending(jid, req))
-                .orElse("Não entendi. Envie no formato: *Descrição Valor* (ex: Pizza 50) ou remover \"Descrição\"");
+                .map(req -> saveSpending(jid, phone, req))
+                .orElse("Não entendi. Envie no formato: *Descrição Valor* (ex: Pizza 50) ou *Descrição Valor Categoria Data* (ex: Pizza 50 Alimentacao 12/05)");
     }
 
     private String normalizeSessionName(String text) {
@@ -72,19 +78,20 @@ public class SpendingService {
         return name;
     }
 
-    private String saveSpending(String jid, com.devlil0.spending_system.dto.SpendingRequest req) {
+    private String saveSpending(String jid, String phone, com.devlil0.spending_system.dto.SpendingRequest req) {
         var entity = SpendingEntity.builder()
                 .jid(jid)
-                .phone(jid)
+                .phone(phone)
                 .description(req.description().toUpperCase(Locale.ROOT))
                 .amount(req.amount())
                 .category(req.category().toUpperCase(Locale.ROOT))
+                .createdAt(req.date())
                 .build();
 
         spendingRepository.save(entity);
 
-        return String.format("Gasto registrado!\n%s\nR$ %.2f\n%s",
-                req.description(), req.amount(), req.category());
+        return String.format("Gasto registrado!\n%s\nR$ %.2f\n%s\n%s",
+                req.description(), req.amount(), req.category(), req.date().format(SUMMARY_DATE_FORMATTER));
     }
 
     private String buildSummary(String jid, String sessionName) {
@@ -98,17 +105,17 @@ public class SpendingService {
 
         StringBuilder summary = new StringBuilder();
         summary.append(String.format("*TOTAL DE GASTOS %s:* \uD83D\uDCC8\n", sessionName.toUpperCase(Locale.ROOT)));
-
-
+        summary.append("NOME | VALOR | CATEGORIA | DATA\n");
 
         for (int i = 0; i < gastos.size(); i++) {
             SpendingEntity gasto = gastos.get(i);
-            summary.append(String.format("%d. %s | R$ %.2f | %s\n\n",
+            summary.append(String.format("%d. %s | R$ %.2f | %s | %s\n",
 
                     i + 1,
                     gasto.getDescription(),
                     gasto.getAmount(),
-                    gasto.getCategory()));
+                    gasto.getCategory(),
+                    gasto.getCreatedAt().format(SUMMARY_DATE_FORMATTER)));
 
             if (i < gastos.size() - 1) {
                 summary.append("\n");

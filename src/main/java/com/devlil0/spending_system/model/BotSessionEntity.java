@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "bot_session")
+@Table(name = "bot_user_session")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +23,11 @@ public class BotSessionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String jid;
+
+    @Column(nullable = false, unique = true)
+    private String phone;
 
     private String name;
 

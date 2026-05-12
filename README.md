@@ -55,13 +55,13 @@ $env:BOT_ALLOWED_JIDS="120363123456789012@g.us,120363987654321098@g.us"
 
 Use o JID completo da conversa. Para grupos, o JID termina com `@g.us`; para conversa direta, normalmente termina com `@s.whatsapp.net`. Em grupos autorizados, qualquer participante pode enviar mensagens e o bot responde no grupo. Os gastos, resumos e remocoes ficam separados por JID da conversa.
 
-Na primeira mensagem de cada JID, o bot solicita um nome de sessao:
+Na primeira mensagem de cada telefone em um JID permitido, o bot solicita um nome de sessao:
 
 ```text
 Digite o seu nome:
 ```
 
-A resposta seguinte salva o nome da sessao, por exemplo `Juliana`, e o bot responde `Olá Juliana`. Depois disso, o resumo usa esse nome:
+A resposta seguinte salva o nome da sessao para aquele telefone, por exemplo `Juliana`, e o bot responde `Olá Juliana`. Depois disso, o resumo usa esse nome, enquanto os gastos continuam separados pelo JID da conversa:
 
 ```text
 TOTAL DE GASTOS JULIANA:
@@ -112,10 +112,14 @@ Em ambiente local, exponha a porta com uma ferramenta como ngrok ou Cloudflare T
 Registrar gasto:
 
 ```text
+Pizza 50 12/05
+Uber 22,90 Transporte 12/05
+Mercado 120,50 Alimentacao 12/05
 Pizza 50
 Uber 22,90 Transporte
-Mercado 120,50 Alimentacao
 ```
+
+Categoria e data sao opcionais. Sem categoria, o bot usa `Outros`. Sem data, o bot usa a data e horario atuais.
 
 Ver resumo:
 

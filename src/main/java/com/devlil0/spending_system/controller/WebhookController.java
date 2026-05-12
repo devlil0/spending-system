@@ -56,7 +56,7 @@ public class WebhookController {
         }
 
         String replyTarget = resolveReplyTarget(remoteJid, phone);
-        String reply = spendingService.processMessage(normalizeJid(remoteJid), text.trim());
+        String reply = spendingService.processMessage(normalizeJid(remoteJid), normalizePhone(phone), text.trim());
         try {
             whatsappSendMsgService.sendText(replyTarget, reply);
         } catch (RuntimeException ex) {

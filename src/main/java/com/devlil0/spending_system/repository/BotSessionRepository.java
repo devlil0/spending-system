@@ -11,4 +11,6 @@ public interface BotSessionRepository extends JpaRepository<BotSessionEntity, Lo
 
     Optional<BotSessionEntity> findByJid(String jid);
 
+    Optional<BotSessionEntity> findByPhone(String phone);
+
 }
