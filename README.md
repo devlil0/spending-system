@@ -133,7 +133,7 @@ Ronaldo Almoco 37.00 Alimentacao 11/05
 Ver resumo:
 
 ```text
-/resumo
+gastos
 ```
 
 Ver totais por categoria:

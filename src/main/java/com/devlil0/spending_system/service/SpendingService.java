@@ -56,7 +56,7 @@ public class SpendingService {
         }
 
         String sessionName = session.getName();
-        if (text.equalsIgnoreCase("/resumo")) {
+        if (text.equalsIgnoreCase("gastos")) {
             return buildSummary(jid, sessionName);
         }
 
@@ -164,7 +164,7 @@ public class SpendingService {
 
         StringBuilder summary = new StringBuilder();
         summary.append(String.format("*TOTAL DE GASTOS %s:* \uD83D\uDCC8\n", sessionName.toUpperCase(Locale.ROOT)));
-        summary.append("NOME | VALOR | CATEGORIA | DATA\n");
+        summary.append("\n");
 
         for (int i = 0; i < gastos.size(); i++) {
             SpendingEntity gasto = gastos.get(i);
@@ -180,7 +180,7 @@ public class SpendingService {
                 summary.append("\n");
             }
         }
-        summary.append(String.format("TOTAL: R$ %.2f\n", total));
+        summary.append(String.format("\nTOTAL: R$ %.2f\n", total));
         summary.append(String.format("ITEMS: %d\n", gastos.size()));
         return summary.toString();
 
