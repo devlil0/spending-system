@@ -19,7 +19,7 @@ public class WebhookController {
     private final SpendingService spendingService;
     private final WhatsappSendMsgService whatsappSendMsgService;
 
-    @PostMapping("/whatsapp")
+    @PostMapping({"/whatsapp", "/whatsapp/messages-upsert"})
     public ResponseEntity<Void> receive(@RequestBody EvolutionWebhookPayload payload) {
         if (payload == null || !"messages.upsert".equals(payload.getEvent())) {
             return ResponseEntity.ok().build();
