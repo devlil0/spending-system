@@ -7,6 +7,7 @@ import com.devlil0.spending_system.service.WhatsappSendMsgService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,9 @@ public class WebhookController {
 
     private final SpendingService spendingService;
     private final WhatsappSendMsgService whatsappSendMsgService;
+
+    @Value("${bot.allowed-phone:}")
+    private String allowedPhone;
 
     @PostMapping({"/whatsapp", "/whatsapp/messages-upsert"})
     public ResponseEntity<Void> receive(@RequestBody EvolutionWebhookPayload payload) {
@@ -40,11 +44,16 @@ public class WebhookController {
             return ResponseEntity.ok().build();
         }
 
+        String senderJid = resolveSenderJid(payload, remoteJid);
+        String phone = extractPhone(senderJid);
+        if (!isAllowedPhone(phone)) {
+            return ResponseEntity.ok().build();
+        }
+
         if (isBotReply(text)) {
             return ResponseEntity.ok().build();
         }
 
-        String phone = extractPhone(resolveSenderJid(payload, remoteJid));
         String replyTarget = resolveReplyTarget(remoteJid, phone);
         String reply = spendingService.processMessage(phone, text.trim());
         try {
@@ -58,6 +67,23 @@ public class WebhookController {
 
     private String extractPhone(String remoteJid) {
         return remoteJid.split("@")[0];
+    }
+
+    private boolean isAllowedPhone(String phone) {
+        String normalizedAllowedPhone = normalizePhone(allowedPhone);
+        if (normalizedAllowedPhone.isBlank()) {
+            return true;
+        }
+
+        return normalizePhone(phone).equals(normalizedAllowedPhone);
+    }
+
+    private String normalizePhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+
+        return phone.replaceAll("\\D", "");
     }
 
     private String resolveSenderJid(EvolutionWebhookPayload payload, String remoteJid) {

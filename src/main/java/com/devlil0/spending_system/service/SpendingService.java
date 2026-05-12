@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,9 +45,9 @@ public class SpendingService {
     private String saveSpending(String phone, com.devlil0.spending_system.dto.SpendingRequest req) {
         var entity = SpendingEntity.builder()
                 .phone(phone)
-                .description(req.description())
+                .description(req.description().toUpperCase(Locale.ROOT))
                 .amount(req.amount())
-                .category(req.category())
+                .category(req.category().toUpperCase(Locale.ROOT))
                 .build();
 
         spendingRepository.save(entity);

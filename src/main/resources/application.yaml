@@ -17,3 +17,6 @@ evolution:
   base-url: ${EVOLUTION_BASE_URL:http://localhost:8081}
   api-key: ${EVOLUTION_API_KEY:}
   instance: ${EVOLUTION_INSTANCE:}
+
+bot:
+  allowed-phone: ${BOT_ALLOWED_PHONE:}
