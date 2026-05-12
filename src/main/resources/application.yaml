@@ -19,4 +19,4 @@ evolution:
   instance: ${EVOLUTION_INSTANCE:}
 
 bot:
-  allowed-phone: ${BOT_ALLOWED_PHONE:}
+  allowed-jids: ${BOT_ALLOWED_JIDS:}

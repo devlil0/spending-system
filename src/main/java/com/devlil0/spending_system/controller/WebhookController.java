@@ -24,8 +24,8 @@ public class WebhookController {
     private final SpendingService spendingService;
     private final WhatsappSendMsgService whatsappSendMsgService;
 
-    @Value("${bot.allowed-phone:}")
-    private String allowedPhone;
+    @Value("${bot.allowed-jids:}")
+    private String allowedJids;
 
     @PostMapping({"/whatsapp", "/whatsapp/messages-upsert"})
     public ResponseEntity<Void> receive(@RequestBody EvolutionWebhookPayload payload) {
@@ -44,11 +44,12 @@ public class WebhookController {
             return ResponseEntity.ok().build();
         }
 
-        String senderJid = resolveSenderJid(payload, remoteJid);
-        String phone = extractPhone(senderJid);
-        if (!isAllowedPhone(phone)) {
+        if (!isAllowedJid(remoteJid)) {
             return ResponseEntity.ok().build();
         }
+
+        String senderJid = resolveSenderJid(payload, remoteJid);
+        String phone = extractPhone(senderJid);
 
         if (isBotReply(text)) {
             return ResponseEntity.ok().build();
@@ -69,13 +70,25 @@ public class WebhookController {
         return remoteJid.split("@")[0];
     }
 
-    private boolean isAllowedPhone(String phone) {
-        String normalizedAllowedPhone = normalizePhone(allowedPhone);
-        if (normalizedAllowedPhone.isBlank()) {
+    private boolean isAllowedJid(String remoteJid) {
+        String normalizedRemoteJid = normalizeJid(remoteJid);
+        if (allowedJids == null || allowedJids.isBlank()) {
             return true;
         }
 
-        return normalizePhone(phone).equals(normalizedAllowedPhone);
+        return allowedJids.lines()
+                .flatMap(line -> java.util.Arrays.stream(line.split("[,;|]")))
+                .map(this::normalizeJid)
+                .filter(allowedJid -> !allowedJid.isBlank())
+                .anyMatch(normalizedRemoteJid::equals);
+    }
+
+    private String normalizeJid(String jid) {
+        if (jid == null) {
+            return "";
+        }
+
+        return jid.trim().toLowerCase();
     }
 
     private String normalizePhone(String phone) {

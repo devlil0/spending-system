@@ -45,15 +45,15 @@ As configuracoes podem ser definidas por variaveis de ambiente:
 | `EVOLUTION_BASE_URL` | `http://localhost:8081` | URL base da Evolution API |
 | `EVOLUTION_API_KEY` | vazio | Chave da Evolution API |
 | `EVOLUTION_INSTANCE` | vazio | Nome da instancia na Evolution API |
-| `BOT_ALLOWED_PHONE` | vazio | Numero autorizado a usar o bot |
+| `BOT_ALLOWED_JIDS` | vazio | JIDs autorizados a acionar o bot, separados por virgula |
 
-Defina `BOT_ALLOWED_PHONE` para evitar que o bot responda qualquer pessoa:
+Defina `BOT_ALLOWED_JIDS` para evitar que o bot responda conversas fora da lista:
 
 ```powershell
-$env:BOT_ALLOWED_PHONE="5511999999999"
+$env:BOT_ALLOWED_JIDS="120363123456789012@g.us,120363987654321098@g.us"
 ```
 
-Use o numero com DDI e DDD. O codigo compara apenas os digitos, entao `+55 11 99999-9999` e `5511999999999` sao equivalentes.
+Use o JID completo da conversa. Para grupos, o JID termina com `@g.us`; para conversa direta, normalmente termina com `@s.whatsapp.net`. Em grupos autorizados, qualquer participante pode enviar mensagens e o bot responde no grupo.
 
 ## Rodando localmente
 
@@ -69,7 +69,7 @@ Configure as variaveis da Evolution API:
 $env:EVOLUTION_BASE_URL="https://sua-evolution-api.com"
 $env:EVOLUTION_API_KEY="sua-chave"
 $env:EVOLUTION_INSTANCE="sua-instancia"
-$env:BOT_ALLOWED_PHONE="5511999999999"
+$env:BOT_ALLOWED_JIDS="120363123456789012@g.us,120363987654321098@g.us"
 ```
 
 Rode a aplicacao:
