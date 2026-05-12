@@ -11,4 +11,10 @@ public interface SpendingRepository extends JpaRepository<SpendingEntity, Long> 
 
     List<SpendingEntity> findByPhone(String phone);
 
+    List<SpendingEntity> findByPhoneOrderByCreatedAtAsc(String phone);
+
+    List<SpendingEntity> findByPhoneAndDescriptionIgnoreCase(String phone, String description);
+
+    void deleteByPhone(String phone);
+
 }

@@ -80,6 +80,10 @@ public class WebhookController {
         return text.startsWith("Gasto registrado!")
                 || text.startsWith("Não entendi.")
                 || text.startsWith("Nenhum gasto registrado")
+                || text.startsWith("Nenhum gasto encontrado")
+                || text.startsWith("Nenhum gasto registrado para remover")
+                || text.startsWith("Gasto removido!")
+                || text.startsWith("Todos os gastos foram removidos!")
                 || text.startsWith("📊");
     }
 
