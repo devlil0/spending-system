@@ -58,20 +58,21 @@ public class SpendingService {
     private String buildSummary(String phone) {
         var gastos = spendingRepository.findByPhoneOrderByCreatedAtAsc(phone);
 
-        if (gastos.isEmpty()) return "Nenhum gasto registrado ainda!";
+        if (gastos.isEmpty()) return "*NENHUM GASTO REGISTRADO!*";
 
         BigDecimal total = gastos.stream()
                 .map(SpendingEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StringBuilder summary = new StringBuilder();
-        summary.append("📊 *Resumo de gastos*\n");
-        summary.append(String.format("Total: R$ %.2f\n", total));
-        summary.append(String.format("Registros: %d\n\n", gastos.size()));
+        summary.append("*TOTAL DE GASTOS* \n");
+
+
 
         for (int i = 0; i < gastos.size(); i++) {
             SpendingEntity gasto = gastos.get(i);
-            summary.append(String.format("%d. %s - R$ %.2f - %s",
+            summary.append(String.format("%d. %s | R$ %.2f | %s",
+
                     i + 1,
                     gasto.getDescription(),
                     gasto.getAmount(),
@@ -81,7 +82,8 @@ public class SpendingService {
                 summary.append("\n");
             }
         }
-
+        summary.append(String.format("TOTAL: R$ %.2f\n", total));
+        summary.append(String.format("ITEMS: %d\n", gastos.size()));
         return summary.toString();
 
     }
@@ -90,23 +92,23 @@ public class SpendingService {
         var gastos = spendingRepository.findByPhoneAndDescriptionIgnoreCase(phone, description);
 
         if (gastos.isEmpty()) {
-            return String.format("Nenhum gasto encontrado com o nome: %s", description);
+            return String.format("NENHUM GASTO COM O NOME %s", description);
         }
 
         spendingRepository.deleteAll(gastos);
 
-        return String.format("Gasto removido!\n%s\nRegistros removidos: %d", description, gastos.size());
+        return String.format("GASTO REMOVIDO!");
     }
 
     private String removeAllSpendings(String phone) {
         long count = spendingRepository.findByPhone(phone).size();
 
         if (count == 0) {
-            return "Nenhum gasto registrado para remover.";
+            return "NENHUM GASTO REGISTRADO PARA SER REMOVIDO!.";
         }
 
         spendingRepository.deleteByPhone(phone);
 
-        return String.format("Todos os gastos foram removidos!\nRegistros removidos: %d", count);
+        return String.format("TODOS OS GASTOS FORAM REMOVIDOS!");
     }
 }
