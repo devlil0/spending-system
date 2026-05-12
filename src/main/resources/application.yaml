@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: spending_system
+
+  datasource:
+    url: jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:spendingsystem}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: ${PORT:8080}
+
+evolution:
+  base-url: ${EVOLUTION_BASE_URL:http://localhost:8081}
+  api-key: ${EVOLUTION_API_KEY:}
+  instance: ${EVOLUTION_INSTANCE:}

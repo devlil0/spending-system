@@ -1,0 +1,54 @@
+package com.devlil0.spending_system.controller;
+
+import com.devlil0.spending_system.dto.EvolutionWebhookPayload;
+import com.devlil0.spending_system.dto.MessageData;
+import com.devlil0.spending_system.service.SpendingService;
+import com.devlil0.spending_system.service.WhatsappSendMsgService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/webhook")
+@RequiredArgsConstructor
+public class WebhookController {
+
+    private final SpendingService spendingService;
+    private final WhatsappSendMsgService whatsappSendMsgService;
+
+    @PostMapping("/whatsapp")
+    public ResponseEntity<Void> receive(@RequestBody EvolutionWebhookPayload payload) {
+        if (payload == null || !"messages.upsert".equals(payload.getEvent())) {
+            return ResponseEntity.ok().build();
+        }
+
+        MessageData data = payload.getData();
+        if (data == null || data.getKey() == null || data.getMessage() == null) {
+            return ResponseEntity.ok().build();
+        }
+
+        if (data.getKey().isFromMe()) {
+            return ResponseEntity.ok().build();
+        }
+
+        String remoteJid = data.getKey().getRemoteJid();
+        String text = data.getMessage().getText();
+        if (remoteJid == null || text == null || text.isBlank()) {
+            return ResponseEntity.ok().build();
+        }
+
+        String phone = extractPhone(remoteJid);
+        String reply = spendingService.processMessage(phone, text.trim());
+        whatsappSendMsgService.sendText(phone, reply);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private String extractPhone(String remoteJid) {
+        return remoteJid.split("@")[0];
+    }
+
+}
