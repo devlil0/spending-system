@@ -25,6 +25,8 @@ public class SpendingService {
             Pattern.compile("^editar\\s+(.+?)\\s+(nome|descricao|descrição|valor|categoria|data)\\s+(.+)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern BIGGEST_PATTERN =
             Pattern.compile("^maiores(?:\\s+(\\d+))?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CHANGE_NAME_PATTERN =
+            Pattern.compile("^alterar\\s+nome(?:\\s+(.+))?$", Pattern.CASE_INSENSITIVE);
 
     private final BotSessionRepository botSessionRepository;
     private final MessageParser messageParser;
@@ -51,21 +53,36 @@ public class SpendingService {
             return String.format("Olá %s", name);
         }
 
-        return routeCommand(jid, phone, session.getName(), text);
+        return routeCommand(jid, phone, session, text);
     }
 
     public String buildDailySummary(String jid) {
         return spendingReportService.buildDailySummary(jid);
     }
 
-    private String routeCommand(String jid, String phone, String sessionName, String text) {
+    private String routeCommand(String jid, String phone, BotSessionEntity session, String text) {
         if (text.equalsIgnoreCase("ajuda")) {
             return spendingReportService.buildHelp();
         }
 
+        Matcher changeNameMatcher = CHANGE_NAME_PATTERN.matcher(text.trim());
+        if (changeNameMatcher.matches()) {
+            String newName = changeNameMatcher.group(1);
+            if (newName == null || newName.isBlank()) {
+                session.setName(null);
+                botSessionRepository.save(session);
+                return "Digite o seu nome:";
+            }
+
+            String normalizedName = normalizeSessionName(newName);
+            session.setName(normalizedName);
+            botSessionRepository.save(session);
+            return String.format("Olá %s", normalizedName);
+        }
+
         if (text.toLowerCase(Locale.ROOT).startsWith("gastos")) {
             SpendingPeriod period = periodParser.resolve(text.substring("gastos".length()).trim());
-            return spendingReportService.buildSummary(jid, sessionName, period);
+            return spendingReportService.buildSummary(jid, session.getName(), period);
         }
 
         if (text.equalsIgnoreCase("categorias")) {

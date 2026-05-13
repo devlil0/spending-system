@@ -47,7 +47,22 @@ public class SpendingMutationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StringBuilder reply = new StringBuilder();
-        reply.append(String.format("%d gastos registrados!", saved.size()));
+        reply.append(String.format("*%d GASTOS REGISTRADOS!*\n\n", saved.size()));
+
+        for (int i = 0; i < saved.size(); i++) {
+            SpendingEntity spending = saved.get(i);
+            reply.append(String.format("%s (%d) | R$ %.2f | %s | %s\n",
+                    spending.getDescription(),
+                    spending.getId(),
+                    spending.getAmount(),
+                    spending.getCategory(),
+                    spending.getCreatedAt().format(DATE_FORMATTER)));
+
+            if (i < saved.size() - 1) {
+                reply.append("\n");
+            }
+        }
+
         reply.append(String.format("\nTOTAL: R$ %.2f", total));
 
         if (!invalidLines.isEmpty()) {
@@ -59,13 +74,14 @@ public class SpendingMutationService {
     }
 
     public String saveSingle(String jid, String phone, SpendingRequest request) {
-        saveEntity(jid, phone, request);
+        SpendingEntity spending = saveEntity(jid, phone, request);
 
-        return String.format("Gasto registrado!\n%s\nR$ %.2f\n%s\n%s",
-                request.description(),
-                request.amount(),
-                request.category(),
-                request.date().format(DATE_FORMATTER));
+        return String.format("*GASTO REGISTRADO!*\n\n%s (%d) | R$ %.2f | %s | %s",
+                spending.getDescription(),
+                spending.getId(),
+                spending.getAmount(),
+                spending.getCategory(),
+                spending.getCreatedAt().format(DATE_FORMATTER));
     }
 
     public String editById(String jid, Matcher editMatcher) {

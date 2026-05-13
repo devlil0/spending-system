@@ -45,6 +45,8 @@ public class SpendingReportService {
                 editar 3 data 12/05
                 remover 3
                 remover todos
+                alterar nome
+                alterar nome Juliana
                 """.trim();
     }
 
@@ -70,13 +72,14 @@ public class SpendingReportService {
         if (period != null) {
             summary.append(String.format("PERIODO: %s\n", period.label()));
         }
+        summary.append("O NÚMERO AO LADO DO NOME É O ID DO GASTO.\n");
         summary.append("\n");
 
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("ID %d | %s | R$ %.2f | %s | %s\n",
-                    spending.getId(),
+            summary.append(String.format("%s (%d) | R$ %.2f | %s | %s\n",
                     spending.getDescription(),
+                    spending.getId(),
                     spending.getAmount(),
                     spending.getCategory(),
                     spending.getCreatedAt().format(DATE_FORMATTER)));
@@ -127,12 +130,13 @@ public class SpendingReportService {
         if (period != null) {
             summary.append(String.format("PERIODO: %s\n\n", period.label()));
         }
+        summary.append("O NÚMERO AO LADO DO NOME É O ID DO GASTO.\n\n");
 
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("ID %d | %s | R$ %.2f | %s\n",
-                    spending.getId(),
+            summary.append(String.format("%s (%d) | R$ %.2f | %s\n",
                     spending.getDescription(),
+                    spending.getId(),
                     spending.getAmount(),
                     spending.getCreatedAt().format(DATE_FORMATTER)));
 
@@ -156,11 +160,12 @@ public class SpendingReportService {
         if (spendings.isEmpty()) return "*NENHUM GASTO REGISTRADO!*";
 
         StringBuilder summary = new StringBuilder(String.format("*MAIORES GASTOS (%d)*\n\n", normalizedLimit));
+        summary.append("O NÚMERO AO LADO DO NOME É O ID DO GASTO.\n\n");
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("ID %d | %s | R$ %.2f | %s | %s\n",
-                    spending.getId(),
+            summary.append(String.format("%s (%d) | R$ %.2f | %s | %s\n",
                     spending.getDescription(),
+                    spending.getId(),
                     spending.getAmount(),
                     spending.getCategory(),
                     spending.getCreatedAt().format(DATE_FORMATTER)));

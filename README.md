@@ -180,6 +180,13 @@ Ver todos os comandos:
 ajuda
 ```
 
+Alterar nome da sessao:
+
+```text
+alterar nome
+alterar nome Juliana
+```
+
 Remover gasto por descricao:
 
 ```text
