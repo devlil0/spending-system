@@ -58,7 +58,7 @@ public class SpendingReportService {
             return "";
         }
 
-        return String.format("*RESUMO DE HOJE*\nTOTAL: R$ %.2f\nITEMS: %d",
+        return String.format("*RESUMO DE HOJE*\nTOTAL: R$ %.2f\nITENS: %d",
                 calculateTotal(spendings),
                 spendings.size());
     }
@@ -91,7 +91,7 @@ public class SpendingReportService {
         }
 
         summary.append(String.format("\nTOTAL: R$ %.2f\n", calculateTotal(spendings)));
-        summary.append(String.format("ITEMS: %d", spendings.size()));
+        summary.append(String.format("ITENS: %d", spendings.size()));
         return summary.toString();
     }
 
@@ -148,7 +148,7 @@ public class SpendingReportService {
         }
 
         summary.append(String.format("\nTOTAL: R$ %.2f\n", calculateTotal(spendings)));
-        summary.append(String.format("ITEMS: %d\n", spendings.size()));
+        summary.append(String.format("ITENS: %d\n", spendings.size()));
         return summary.toString();
     }
 
