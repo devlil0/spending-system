@@ -48,6 +48,8 @@ As configuracoes podem ser definidas por variaveis de ambiente:
 | `BOT_ALLOWED_JIDS` | vazio | JIDs autorizados a acionar o bot, separados por virgula |
 | `BOT_DAILY_SUMMARY_ENABLED` | `true` | Habilita resumo diario automatico |
 | `BOT_DAILY_SUMMARY_CRON` | `0 0 21 * * *` | Cron do resumo diario no fuso `America/Sao_Paulo` |
+| `BOT_MORNING_REMINDER_ENABLED` | `true` | Habilita lembrete automatico pela manha |
+| `BOT_MORNING_REMINDER_CRON` | `0 0 9 * * *` | Cron do lembrete matinal no fuso `America/Sao_Paulo` |
 
 Defina `BOT_ALLOWED_JIDS` para evitar que o bot responda conversas fora da lista:
 
