@@ -39,14 +39,13 @@ public class SpendingReportService {
                 maiores
                 maiores 10
                 editar <id ou nome> <campo> <novo valor>
-                editar 3 valor 45,90
+                editar <id> valor 45,90
                 editar Pizza valor 45,90
-                editar 3 categoria Mercado
-                editar 3 data 12/05
-                remover 3
-                remover todos
-                alterar nome
-                alterar nome Juliana
+                editar <id> categoria Mercado
+                editar <id> data 12/05
+                remover <id>
+                remover todos 
+                alterar nome <nome desejado>
                 """.trim();
     }
 
@@ -72,7 +71,7 @@ public class SpendingReportService {
         if (period != null) {
             summary.append(String.format("PERIODO: %s\n", period.label()));
         }
-        summary.append("O NÚMERO AO LADO DO NOME É O ID DO GASTO.\n");
+        summary.append("\nO NÚMERO AO LADO DO NOME É O *ID* DO *GASTO*.\n");
         summary.append("\n");
 
         for (int i = 0; i < spendings.size(); i++) {
@@ -90,7 +89,7 @@ public class SpendingReportService {
         }
 
         summary.append(String.format("\nTOTAL: R$ %.2f\n", calculateTotal(spendings)));
-        summary.append(String.format("ITEMS: %d\n", spendings.size()));
+        summary.append(String.format("ITEMS: %d", spendings.size()));
         return summary.toString();
     }
 
