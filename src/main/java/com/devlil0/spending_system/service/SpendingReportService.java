@@ -68,7 +68,7 @@ public class SpendingReportService {
         if (spendings.isEmpty()) return "*NENHUM GASTO REGISTRADO!*";
 
         StringBuilder summary = new StringBuilder();
-        summary.append(String.format("*TOTAL DE GASTOS %s:* \uD83D\uDCC8\n", sessionName.toUpperCase()));
+        summary.append(String.format("*GASTOS DE %s \uD83D\uDCC8*\n", sessionName.toUpperCase()));
         if (period != null) {
             summary.append(String.format("PERIODO: %s\n", period.label()));
         }
