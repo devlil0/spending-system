@@ -76,7 +76,8 @@ public class SpendingReportService {
 
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("%s (%d) | R$ %.2f | %s | %s\n",
+            summary.append(String.format("%d. %s (%d) | R$ %.2f | %s | %s\n",
+                    i + 1,
                     spending.getDescription(),
                     spending.getId(),
                     spending.getAmount(),
@@ -133,7 +134,8 @@ public class SpendingReportService {
 
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("%s (%d) | R$ %.2f | %s\n",
+            summary.append(String.format("%d. %s (%d) | R$ %.2f | %s\n",
+                    i + 1,
                     spending.getDescription(),
                     spending.getId(),
                     spending.getAmount(),
@@ -162,7 +164,8 @@ public class SpendingReportService {
         summary.append("O NÚMERO AO LADO DO NOME É O ID DO GASTO.\n\n");
         for (int i = 0; i < spendings.size(); i++) {
             SpendingEntity spending = spendings.get(i);
-            summary.append(String.format("%s (%d) | R$ %.2f | %s | %s\n",
+            summary.append(String.format("%d. %s (%d) | R$ %.2f | %s | %s\n",
+                    i + 1,
                     spending.getDescription(),
                     spending.getId(),
                     spending.getAmount(),
