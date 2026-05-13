@@ -14,7 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DailySummaryScheduler {
 
-    private static final String MORNING_REMINDER_MESSAGE = "Bom dia %s, não se esqueça se anotar seus gastos!";
+    private static final String MORNING_REMINDER_MESSAGE = "Bom dia %s, não se esqueça de anotar seus gastos!";
 
     private final SpendingService spendingService;
     private final BotSessionRepository botSessionRepository;
