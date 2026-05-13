@@ -31,6 +31,7 @@ public class SpendingReportService {
                 gastos hoje
                 gastos semana
                 gastos mes
+                gastos 12/05
                 gastos 01/05 15/05
                 categorias
                 categoria mercado

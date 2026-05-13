@@ -19,6 +19,8 @@ public class SpendingPeriodParser {
 
     private static final Pattern PERIOD_RANGE_PATTERN =
             Pattern.compile("^(\\d{2}/\\d{2})\\s+(\\d{2}/\\d{2})$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DAY_MONTH_PATTERN =
+            Pattern.compile("^\\d{2}/\\d{2}$", Pattern.CASE_INSENSITIVE);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final CategoryNormalizer categoryNormalizer;
@@ -40,6 +42,13 @@ public class SpendingPeriodParser {
         if (normalized.equals("MES")) {
             LocalDate start = today.withDayOfMonth(1);
             return new SpendingPeriod(start.atStartOfDay(), today.atTime(LocalTime.MAX), label(start, today));
+        }
+
+        if (DAY_MONTH_PATTERN.matcher(value).matches()) {
+            LocalDate date = parseDayMonth(value);
+            if (date != null) {
+                return new SpendingPeriod(date.atStartOfDay(), date.atTime(LocalTime.MAX), date.format(DATE_FORMATTER));
+            }
         }
 
         Matcher rangeMatcher = PERIOD_RANGE_PATTERN.matcher(value);
