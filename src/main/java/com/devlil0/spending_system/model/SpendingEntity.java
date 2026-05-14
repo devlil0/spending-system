@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.devlil0.spending_system.config.ApplicationTimeZoneConfig;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -36,6 +38,13 @@ public class SpendingEntity {
 
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now(ApplicationTimeZoneConfig.SAO_PAULO_ZONE_ID);
+
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now(ApplicationTimeZoneConfig.SAO_PAULO_ZONE_ID);
+        }
+    }
 
 }

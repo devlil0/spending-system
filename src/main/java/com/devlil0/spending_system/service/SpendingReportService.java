@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +24,7 @@ public class SpendingReportService {
     private final SpendingRepository spendingRepository;
     private final SpendingPeriodParser periodParser;
     private final CategoryNormalizer categoryNormalizer;
+    private final Clock clock;
 
     public String buildHelp() {
         return """
@@ -51,7 +53,7 @@ public class SpendingReportService {
     }
 
     public String buildDailySummary(String jid) {
-        var today = LocalDate.now();
+        var today = LocalDate.now(clock);
         var period = new SpendingPeriod(today.atStartOfDay(), today.atTime(LocalTime.MAX), "HOJE");
         var spendings = periodParser.filter(spendingRepository.findByJidOrderByCreatedAtAsc(jid), period);
         if (spendings.isEmpty()) {

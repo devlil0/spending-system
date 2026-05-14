@@ -4,6 +4,7 @@ import com.devlil0.spending_system.model.SpendingEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Year;
@@ -24,6 +25,7 @@ public class SpendingPeriodParser {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final CategoryNormalizer categoryNormalizer;
+    private final Clock clock;
 
     public SpendingPeriod resolve(String value) {
         if (value == null || value.isBlank()) {
@@ -31,7 +33,7 @@ public class SpendingPeriodParser {
         }
 
         String normalized = categoryNormalizer.normalize(value);
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
         if (normalized.equals("HOJE")) {
             return new SpendingPeriod(today.atStartOfDay(), today.atTime(LocalTime.MAX), "HOJE");
         }
@@ -81,7 +83,7 @@ public class SpendingPeriodParser {
                 return null;
             }
             return LocalDate.of(
-                    Year.now().getValue(),
+                    Year.now(clock).getValue(),
                     Integer.parseInt(dateParts[1]),
                     Integer.parseInt(dateParts[0]));
         } catch (DateTimeParseException ex) {
